@@ -25,7 +25,7 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
 
 # Define UI
 ui <- fluidPage(
-  titlePanel("Holmenkollenstaffet: Estimert vekslingstiden"),
+  titlePanel("Holmenkollstaffet: Estimert vekslingstiden"),
   sidebarLayout(
     sidebarPanel(
       textInput("start_time", "Start Tid (HH:MM):", value = "15:35"),
