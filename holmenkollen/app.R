@@ -20,7 +20,7 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
   }
 
   formatted_times <- format(exchange_times, "%H:%M")
-  return(formatted_times[-1])
+  return(formatted_times[-(length(exchange_times))])
 }
 
 # Define UI
