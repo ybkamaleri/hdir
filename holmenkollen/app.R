@@ -25,12 +25,12 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
 
 # Define UI
 ui <- fluidPage(
-  titlePanel("Holmenkollenstaffet: Estimate vekslingstiden"),
+  titlePanel("Holmenkollenstaffet: Estimert vekslingstiden"),
   sidebarLayout(
     sidebarPanel(
-      textInput("start_time", "Start Tid (HH:MM):", value = "15:15"),
+      textInput("start_time", "Start Tid (HH:MM):", value = "15:35"),
       numericInput("standard_speed", "Gjennomsnitt hastighet (min per km):", value = 5, min = 1, step = 0.1),
-      textInput("speeds", "Spesifikk hastighet per vekslinger (comma-separate, la denne tom hvis gennomsnitt hastighet skal brukes):", value = ""),
+      textInput("speeds", "Spesifikk hastighet per vekslinger (kommaseparert eks 4,6,5,5,4,...) Ellers, la denne tom hvis gennomsnitt hastighet skal brukes:", value = ""),
       actionButton("calculate", "Bergn")
     ),
     mainPanel(
@@ -84,7 +84,7 @@ server <- function(input, output) {
     # if (is.character(times)) {
     #   return(data.frame(Message = times))
     # } else {
-      data.frame(Etappe = paste0("Etappe ", seq_along(times)), Time = times)
+      data.frame(Etappe = paste0("Etappe ", seq_along(times)), Tid = times)
     # }
   })
 }
