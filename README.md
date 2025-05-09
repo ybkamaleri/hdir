@@ -1,4 +1,4 @@
 # hdir
 Anything related to Hdir
 
-[Shinyapp - Holmenkollstaffet estimert vekslingstid](https://ybkamaleri.shinyapps.io/holmenkollstaffeten/)
+[Shinyapp - Holmenkollstafett estimert vekslingstid](https://ybkamaleri.shinyapps.io/holmenkollstafetten/)

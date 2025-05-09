@@ -7,7 +7,7 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
   speeds <- ifelse(is.na(speeds), standard_speed, speeds)
 
   if (length(distances) != length(speeds)) {
-    stop("The number of distances must match the number of speeds.")
+    stop("Antall distanser m?? v??re lik antall hastighet.")
   }
 
   start_time <- as.POSIXct(start_time, format = "%H:%M", tz = "UTC")
@@ -25,13 +25,13 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
 
 # Define UI
 ui <- fluidPage(
-  titlePanel("Holmenkollstaffen: Estimert vekslingstiden"),
+  titlePanel("Holmenkollstafetten: Estimert vekslingstiden"),
   sidebarLayout(
     sidebarPanel(
       textInput("start_time", "Start Tid (HH:MM):", value = "15:35"),
       numericInput("standard_speed", "Gjennomsnitt hastighet (min per km):", value = 5, min = 1, step = 0.1),
       textInput("speeds", "Spesifikk hastighet per vekslinger (kommaseparert eks 4,6,5,5,4,...) Ellers, la denne tom hvis gennomsnitt hastighet skal brukes:", value = ""),
-      actionButton("calculate", "Bergn")
+      actionButton("calculate", "Beregn")
     ),
     mainPanel(
       tableOutput("results")
