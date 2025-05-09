@@ -7,7 +7,7 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
   speeds <- ifelse(is.na(speeds), standard_speed, speeds)
 
   if (length(distances) != length(speeds)) {
-    stop("Antall distanser m?? v??re lik antall hastighet.")
+    stop("Antall distanser må være lik antall hastighet.")
   }
 
   start_time <- as.POSIXct(start_time, format = "%H:%M", tz = "UTC")
@@ -64,7 +64,7 @@ server <- function(input, output) {
     speeds <- if (input$speeds == "") {
       rep(NA, length(distances)) # Use NA to indicate standard speed
     } else {
-      as.numeric(unlist(strsplit(input$speeds, ",")))
+      as.numeric(trimws(unlist(strsplit(input$speeds, ","))))
     }
 
     # Ensure speeds length matches distances
