@@ -1,13 +1,12 @@
-
 library(shiny)
 
-# Function to calculate exchange times
-calculate_exchange_times <- function(start_time, distances, speeds, standard_speed) {
-  # Use standard speed for relays where speed is not specified
+## Calculate exchange times
+calc_exchange_times <- function(start_time, distances, speeds, standard_speed) {
+  ## Use standard speed for relays where speed is not specified
   speeds <- ifelse(is.na(speeds), standard_speed, speeds)
 
   if (length(distances) != length(speeds)) {
-    stop("Antall distanser må være lik antall hastighet.")
+    stop("Antall distanser mC% vC&re lik antall hastighet.")
   }
 
   start_time <- as.POSIXct(start_time, format = "%H:%M", tz = "UTC")
@@ -23,14 +22,13 @@ calculate_exchange_times <- function(start_time, distances, speeds, standard_spe
   return(formatted_times[-(length(exchange_times))])
 }
 
-# Define UI
 ui <- fluidPage(
   titlePanel("Holmenkollstafetten: Estimert vekslingstiden"),
   sidebarLayout(
     sidebarPanel(
       textInput("start_time", "Start Tid (HH:MM):", value = "15:35"),
       numericInput("standard_speed", "Gjennomsnitt hastighet (min per km):", value = 5, min = 1, step = 0.1),
-      textInput("speeds", "Spesifikk hastighet per vekslinger (kommaseparert eks 4,6,5,5,4,...) Ellers, la denne tom hvis gennomsnitt hastighet skal brukes:", value = ""),
+      textInput("speeds", HTML("Spesifikk hastighet per vekslinger (kommaseparert eks 4,6,5,5,4,...) <br>  Ellers, la denne tom hvis gennomsnitt hastighet skal brukes:"), value = ""),
       actionButton("calculate", "Beregn")
     ),
     mainPanel(
@@ -40,7 +38,6 @@ ui <- fluidPage(
 )
 
 
-# Define Server
 server <- function(input, output) {
 
   distances <- c(1100,
@@ -60,20 +57,20 @@ server <- function(input, output) {
                  535)
 
   results <- eventReactive(input$calculate, {
-                                        # Parse speeds input
+    ## Parse speeds input
     speeds <- if (input$speeds == "") {
-      rep(NA, length(distances)) # Use NA to indicate standard speed
-    } else {
-      as.numeric(trimws(unlist(strsplit(input$speeds, ","))))
-    }
+                rep(NA, length(distances)) # Use NA to indicate standard speed
+              } else {
+                as.numeric(trimws(unlist(strsplit(input$speeds, ","))))
+              }
 
-    # Ensure speeds length matches distances
+    ## Ensure speeds length matches distances
     if (length(speeds) != length(distances)) {
       return("Error: The number of speeds must match the number of relays or be left blank.")
     }
 
     tryCatch({
-      calculate_exchange_times(input$start_time, distances, speeds, input$standard_speed)
+      calc_exchange_times(input$start_time, distances, speeds, input$standard_speed)
     }, error = function(e) {
       return(paste("Error:", e$message))
     })
@@ -81,11 +78,11 @@ server <- function(input, output) {
 
   output$results <- renderTable({
     times <- results()
-    # if (is.character(times)) {
-    #   return(data.frame(Message = times))
-    # } else {
+    ## if (is.character(times)) {
+    ##   return(data.frame(Message = times))
+    ## } else {
       data.frame(Etappe = paste0("Etappe ", seq_along(times)), Tid = times)
-    # }
+    ## }
   })
 }
 
