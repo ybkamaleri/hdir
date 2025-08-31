@@ -38,7 +38,7 @@ ui <- fluidPage(
 )
 
 
-server <- function(input, output) {
+server <- function(input, output, session) {
 
   distances <- c(1100,
                  1070,
@@ -84,6 +84,8 @@ server <- function(input, output) {
       data.frame(Etappe = paste0("Etappe ", seq_along(times)), Tid = times)
     ## }
   })
+
+  session$onSessionEnded(stopApp)
 }
 
 # Run the app
