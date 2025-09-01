@@ -1,0 +1,191 @@
+#+TITLE: Intro til Shiny i R
+#+AUTHOR: YBK
+#+OPTIONS: toc:nil num:nil
+#+PROPERTY: header-args:R :session shiny-demo :exports code :results none
+#+STARTUP: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [presentation]
+
+
+* Hva er Shiny?
+** Shiny er et R-pakke for å lage interaktive web-applikasjoner
+- Bygget av RStudio (nå Posit)
+- Krever ingen kunnskap om HTML, CSS eller JavaScript
+- Transformerer R-kode til web-applikasjoner
+- Lag interaktive webapplikasjoner med R
+- Brukes til dashboards, visualisering og rapporter
+
+* Struktur i en Shiny-app
+** UI (User Interface)
+- Brukergrensesnitt
+- Definerer hvordan appen ser ut
+- Input-kontroller (knapper, slidere, etc.)
+- Output-plasseringer (plots, tabeller, etc.)
+
+** Server
+- Definerer hvordan appen oppfører seg
+- Logikk
+- Reaktiv programmering
+- Behandler inputs og genererer outputs
+
+* Eksampel 1
+** [[c:/Users/ykama/Git-hdir/hdir/shiny/eksampel01.R][Struktur]]
+#+BEGIN_SRC R
+library(shiny)
+
+ui = fluidPage(
+  textOutput(outputId = "app_txt")
+)
+server = function(input, output) {
+  output$app_txt = renderText("Kodemøte")
+}
+shinyApp(ui = ui, server = server)
+#+END_SRC
+
+Listening on http://127.0.0.1:6881
+
+* Eksampel 2
+** [[c:/Users/ykama/Git-hdir/hdir/shiny/eksampel022.R][Data input]]
+#+BEGIN_SRC R
+library(shiny)
+library(bslib)
+
+data <- data.frame(col1 = 1:3,
+                   col2 = 4:6)
+
+ui = page_fluid(
+  textOutput(outputId = "app_txt"),
+  br(),
+  tags$b("Fet tekst av UI objekt"),
+  br(),
+  tableOutput(outputId = "table_in")
+)
+
+server = function(input, output, session) {
+  output$app_txt <- renderText("Behandlet i server!")
+  output$table_in <- renderTable(data)
+
+   session$onSessionEnded(stopApp)
+}
+
+shinyApp(ui = ui, server = server)
+#+END_SRC
+* Eksempel 3
+** [[c:/Users/ykama/Git-hdir/hdir/shiny/eksampel02.R][Histogram med slider]]
+#+BEGIN_SRC R
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Hei Shiny!"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("obs", "Antall observasjoner:", min = 10, max = 1000, value = 500)
+    ),
+    mainPanel(
+      plotOutput("distPlot")
+    )
+  )
+)
+
+server <- function(input, output) {
+  output$distPlot <- renderPlot({
+    hist(rnorm(input$obs))
+  })
+}
+
+shinyApp(ui = ui, server = server)
+#+END_SRC
+
+* Reaktivitet
+** Hva betyr reaktivitet?
+- Automatisk oppdatering når input endres
+- Bruk `reactive()` og `render*()` funksjoner
+
+* Eksempel på reaktivitet
+#+BEGIN_SRC R
+server <- function(input, output) {
+  dobbel <- reactive({ input$obs * 2 })
+  output$tekst <- renderText({ paste("Dobbel verdi:", dobbel()) })
+}
+#+END_SRC
+
+* UI-elementer
+** Vanlige input-funksjoner
+- `sliderInput()`
+- `textInput()`
+- `selectInput()`
+- `checkboxInput()`
+
+#+ATTR_ORG: :width 700
+[[~/Git-hdir/hdir/shiny/my-app/www/Shiny-input.png]]
+* Eksempel 4
+** [[c:/Users/ykama/Git-hdir/hdir/shiny/eksampel-text.R][tekstinput]]
+#+BEGIN_SRC R
+ui <- fluidPage(
+  textInput("navn", "Skriv inn navnet ditt:", ""),
+  textOutput("hilsen")
+)
+
+server <- function(input, output) {
+  output$hilsen <- renderText({
+    paste("Hei,", input$navn)
+  })
+}
+
+shinyApp(ui = ui, server = server)
+#+END_SRC
+
+* Themes og layouts
+- [[c:/Users/ykama/Git-hdir/hdir/shiny/eksampel-theme.R][themes]]
+- [[https://shiny.posit.co/r/layouts/][layouts]]
+- [[https://pkgs.rstudio.com/bslib/reference/index.html][bslib package]]
+#+BEGIN_SRC R
+library(shiny)
+library(bslib)
+
+ui <- page_fluid(
+  theme = bs_theme(version = 5, bootswatch = "darkly"),
+  titlePanel("App med tema"),
+  sidebarLayout(
+    sidebarPanel("Sidepanel"),
+    mainPanel("Hovedinnhold")
+  )
+)
+
+server <- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+#+END_SRC
+
+* Hvordan kjøre en app
+** To måter å starte en app
+- `shinyApp(ui, server)`
+- Lagre som `app.R` og kjør med `runApp("app.R")`
+
+* Hvordan dele en app
+** Deling og publisering
+- Lokalt på egen maskin
+- På shinyapps.io
+- På egen Shiny Server
+
+* Andre alternativer
+- [[https://pkgs.rstudio.com/flexdashboard/][flexdashboard package]]
+- [[https://www.htmlwidgets.org/][htmlwidgets package]]
+- [[c:/Users/ykama/Git-hdir/hdir/shiny/cleanfile.html][Kopier-lim til HTML]]
+
+* Grei å vite
+- Fil struktur
+- [[c:/Users/ykama/Git-hdir/hdir/shiny/modules.R][Modules]]
+
+#+ATTR_ORG: :width 700
+[[~/Git-hdir/hdir/shiny/my-app/www/shiny-cheatsheet.png]]
+* Prosjekter
+- [[https://ybkamaleri.shinyapps.io/holmenkollstafetten/][Holmenkollstafetten]]
+- [[https://github.com/ybkamaleri/traume][NTR]]
+
+* Ressurser
+** Lær mer om Shiny
+- 📚 [[https://shiny.rstudio.com/tutorial/][Shiny Tutorial]]
+- 🖼️ [[https://shiny.rstudio.com/gallery/][Shiny Gallery]]
+- 📖 [[https://rstudio.github.io/shiny/][Offisiell dokumentasjon]]
+

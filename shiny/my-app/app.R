@@ -1,8 +1,8 @@
 library(shiny)
 
 # Load modules
-source("modules/numericInputMod.R")
-source("modules/plotMod.R")
+source("R/numericInputMod.R")
+source("R/plotMod.R")
 
 ui <- fluidPage(
   titlePanel("Shiny App med Modules"),

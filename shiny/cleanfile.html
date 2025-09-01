@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Highcharts Dashboard</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #e9ecef;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .tab.active {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    select {
+      padding: 6px;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+
+    /* Dashboard layout */
+    .dashboard-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .chart-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      flex: 1 1 calc(50% - 20px);
+      max-width: calc(50% - 20px);
+      min-width: 350px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .chart-card {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Interactive Highcharts Dashboard</h1>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="sales">Sales Overview</div>
+    <div class="tab" data-tab="customers">Customer Insights</div>
+    <div class="tab" data-tab="market">Market Share</div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <label>
+      Year:
+      <select id="year-filter">
+        <option value="2024" selected>2024</option>
+        <option value="2025">2025</option>
+      </select>
+    </label>
+    <label>
+      Chart Type:
+      <select id="chart-type">
+        <option value="line" selected>Line</option>
+        <option value="column">Column</option>
+        <option value="bar">Bar</option>
+        <option value="pie">Pie</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="sales" class="dashboard-container">
+    <div class="chart-card"><div id="chart1"></div></div>
+    <div class="chart-card"><div id="chart2"></div></div>
+  </div>
+
+  <div id="customers" class="dashboard-container" style="display: none;">
+    <div class="chart-card"><div id="chart3"></div></div>
+    <div class="chart-card"><div id="chart4"></div></div>
+  </div>
+
+  <div id="market" class="dashboard-container" style="display: none;">
+    <div class="chart-card"><div id="chart5"></div></div>
+  </div>
+
+  <script>
+    // -------------------------------
+    // Data sets
+    // -------------------------------
+    const dataSets = {
+      "2024": {
+        revenue: [29, 71, 106, 129, 144, 176, 135, 148],
+        expenses: [12, 35, 90, 70, 100, 120, 110, 90],
+        customers: [120, 180, 240, 300],
+        churn: [5, 8, 7, 6],
+        marketShare: [
+          { name: 'Product A', y: 40 },
+          { name: 'Product B', y: 35 },
+          { name: 'Product C', y: 25 }
+        ]
+      },
+      "2025": {
+        revenue: [34, 85, 123, 150, 170, 190, 160, 175],
+        expenses: [15, 45, 80, 100, 120, 140, 130, 100],
+        customers: [150, 210, 280, 350],
+        churn: [4, 6, 5, 4],
+        marketShare: [
+          { name: 'Product A', y: 38 },
+          { name: 'Product B', y: 40 },
+          { name: 'Product C', y: 22 }
+        ]
+      }
+    };
+
+    // -------------------------------
+    // Chart rendering function
+    // -------------------------------
+    function renderCharts(year, chartType) {
+      // Chart 1 - Revenue
+      Highcharts.chart('chart1', {
+        chart: { type: chartType },
+        title: { text: 'Monthly Revenue' },
+        xAxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'] },
+        yAxis: { title: { text: 'Revenue ($)' } },
+        series: [{ name: 'Revenue', data: dataSets[year].revenue }]
+      });
+
+      // Chart 2 - Expenses
+      Highcharts.chart('chart2', {
+        chart: { type: chartType },
+        title: { text: 'Monthly Expenses' },
+        xAxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'] },
+        yAxis: { title: { text: 'Expenses ($)' } },
+        series: [{ name: 'Expenses', data: dataSets[year].expenses }]
+      });
+
+      // Chart 3 - Customers
+      Highcharts.chart('chart3', {
+        chart: { type: chartType },
+        title: { text: 'Customer Growth' },
+        xAxis: { categories: ['Q1','Q2','Q3','Q4'] },
+        yAxis: { title: { text: 'Customers' } },
+        series: [{ name: 'Customers', data: dataSets[year].customers }]
+      });
+
+      // Chart 4 - Churn
+      Highcharts.chart('chart4', {
+        chart: { type: chartType },
+        title: { text: 'Customer Churn Rate (%)' },
+        xAxis: { categories: ['Q1','Q2','Q3','Q4'] },
+        yAxis: { title: { text: 'Churn Rate (%)' } },
+        series: [{ name: 'Churn Rate', data: dataSets[year].churn }]
+      });
+
+      // Chart 5 - Market Share (always pie)
+      Highcharts.chart('chart5', {
+        chart: { type: 'pie' },
+        title: { text: 'Market Share' },
+        tooltip: { pointFormat: '{series.name}: <b>{point.y}%</b>' },
+        series: [{ name: 'Share', colorByPoint: true, data: dataSets[year].marketShare }]
+      });
+    }
+
+    // -------------------------------
+    // Tabs
+    // -------------------------------
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Activate selected tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Show corresponding dashboard
+        const selectedTab = tab.dataset.tab;
+        document.querySelectorAll('.dashboard-container').forEach(dc => {
+          dc.style.display = 'none';
+        });
+        document.getElementById(selectedTab).style.display = 'flex';
+      });
+    });
+
+    // -------------------------------
+    // Filters
+    // -------------------------------
+    const yearFilter = document.getElementById('year-filter');
+    const chartTypeSelect = document.getElementById('chart-type');
+
+    yearFilter.addEventListener('change', () => {
+      renderCharts(yearFilter.value, chartTypeSelect.value);
+    });
+
+    chartTypeSelect.addEventListener('change', () => {
+      renderCharts(yearFilter.value, chartTypeSelect.value);
+    });
+
+    // -------------------------------
+    // Initial render
+    // -------------------------------
+    renderCharts('2024', 'line');
+  </script>
+
+</body>
+</html>
