@@ -81,46 +81,52 @@ ui <- page_sidebar(
   ),
   theme = bs_theme(
     version = 5,
-    primary  = "#1a5c2e",
+    primary  = "#025169",
     base_font = font_google("Inter")
   ),
 
   ## ── Sidebar ──
   sidebar = sidebar(
     width = 290,
-    bg = "#f4f8f5",
+    bg = "#F0F5FF",
 
-    h6("⏱ Start og tempo", class = "text-uppercase text-muted mb-3",
-       style = "letter-spacing:.05em; font-size:.72rem;"),
+    h6("⏱ Start og tempo", class = "text-uppercase text-muted",
+       style = "letter-spacing:.05em; font-size:.72rem; margin-bottom:4px;"),
 
-    textInput("start_time", "Starttid (HH:MM)", value = "15:35",
-              placeholder = "f.eks. 15:35"),
+    div(style = "margin-bottom:4px;",
+      textInput("start_time", "Starttid (HH:MM)", value = "15:35",
+                placeholder = "f.eks. 15:35")
+    ),
 
-    numericInput("standard_pace",
-                 "Gjennomsnittsfart (min/km)",
-                 value = 5, min = 2, max = 20, step = 0.1),
+    div(style = "margin-bottom:4px;",
+      numericInput("standard_pace",
+                   "Gjennomsnittsfart (min/km)",
+                   value = 5, min = 2, max = 20, step = 0.1)
+    ),
 
-    hr(style = "border-color:#cde0d4;"),
-    h6("🎯 Individuell fart per etappe", class = "text-uppercase text-muted mb-1",
-       style = "letter-spacing:.05em; font-size:.72rem;"),
+    hr(style = "border-color:#cde0d4; margin:6px 0;"),
+    h6("🎯 Individuell fart per etappe", class = "text-uppercase text-muted",
+       style = "letter-spacing:.05em; font-size:.72rem; margin-bottom:2px;"),
     p("Fyll inn fart (min/km) per etappe, kommaseparert.",
-      br(), "La stå tomt for å bruke gjennomsnittsfart.",
-      style = "font-size:.78rem; color:#666;"),
+      br(), "Evt. la stå tomt for å bruke gjennomsnittsfart for alle etapper.",
+      style = "font-size:.78rem; color:#666; margin-bottom:4px;"),
 
-    textAreaInput("speeds", NULL, value = "",
-                  rows = 3,
-                  placeholder = "f.eks. 4.5,5,5.5,..."),
+    div(style = "margin-bottom:4px;",
+      textAreaInput("speeds", NULL, value = "",
+                    rows = 3,
+                    placeholder = "f.eks. 4.5,5,5.5,...")
+    ),
 
     actionButton("calculate", "Beregn vekslingstider",
-                 class = "btn-primary w-100 mt-2",
+                 class = "btn-primary w-100",
                  icon = icon("calculator")),
 
-    hr(style = "border-color:#cde0d4;"),
+    hr(style = "border-color:#cde0d4; margin:6px 0;"),
     uiOutput("summary_box"),
 
     div(
-      style = "margin-top:auto; padding-top:16px; text-align:center;",
-      p("© YBK",
+      style = "padding-top:8px; text-align:center;",
+      p("© Y.Kamaleri",
         style = "font-size:.7rem; color:#aaa; margin:0; letter-spacing:.05em;")
     )
 
