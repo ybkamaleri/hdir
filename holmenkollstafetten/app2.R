@@ -42,8 +42,15 @@ profil_icon <- function(p) {
 calc_exchange_times <- function(start_time, distances, paces, standard_pace) {
   paces <- ifelse(is.na(paces), standard_pace, paces)
 
-  if (length(distances) != length(paces)) {
-    stop("Antall distanser må være lik antall hastighet.")
+  warn_msg <- NULL
+  if (length(paces) < length(distances)) {
+    missing_n  <- length(distances) - length(paces)
+    warn_msg   <- paste0(
+      "⚠️ Mangler fart for ", missing_n, " etappe(r) ",
+      "(etappe ", length(paces) + 1, " til ", length(distances), "). ",
+      "Gjennomsnittsfart ", standard_pace, " min/km brukes for disse."
+    )
+    paces <- c(paces, rep(standard_pace, missing_n))
   }
 
   t0    <- as.POSIXct(start_time, format = "%H:%M", tz = "UTC")
@@ -52,7 +59,12 @@ calc_exchange_times <- function(start_time, distances, paces, standard_pace) {
     mins_taken <- (distances[i] / 1000) * paces[i]
     times <- c(times, tail(times, 1) + as.difftime(mins_taken, units = "mins"))
   }
-  format(times[-length(times)], "%H:%M")  # drop the finish, keep start + one per leg
+
+  list(
+    times    = format(times[-length(times)], "%H:%M"),
+    paces    = paces,
+    warn_msg = warn_msg
+  )
 }
 
 ## ── UI ───────────────────────────────────────────────────────────────────────
@@ -102,7 +114,14 @@ ui <- page_sidebar(
                  icon = icon("calculator")),
 
     hr(style = "border-color:#cde0d4;"),
-    uiOutput("summary_box")
+    uiOutput("summary_box"),
+
+    div(
+      style = "margin-top:auto; padding-top:16px; text-align:center;",
+      p("© YBK",
+        style = "font-size:.7rem; color:#aaa; margin:0; letter-spacing:.05em;")
+    )
+
   ),
 
   ## ── Main ──
@@ -122,49 +141,69 @@ server <- function(input, output, session) {
       rep(NA_real_, n)
     } else {
       vals <- suppressWarnings(as.numeric(unlist(strsplit(raw, ","))))
-      if (length(vals) != n)
+      ## Allow fewer values than etapper — missing ones use standard_pace
+      if (length(vals) > n)
         return(list(error = paste0(
           "Feil: Du har oppgitt ", length(vals),
-          " verdier, men det er ", n, " etapper."
+          " verdier, men det er kun ", n, " etapper."
         )))
       vals
     }
 
-    times <- tryCatch(
+    res <- tryCatch(
       calc_exchange_times(input$start_time, stages$distanse, paces, input$standard_pace),
       error = function(e) list(error = e$message)
     )
-    if (is.list(times) && !is.null(times$error)) return(times)
+    if (!is.null(res$error)) return(res)
 
-    eff_pace <- ifelse(is.na(paces), input$standard_pace, paces)
+    eff_pace <- res$paces
+    times    <- res$times
     mins_vec  <- (stages$distanse / 1000) * eff_pace
     m_int     <- floor(mins_vec)
     s_int     <- round((mins_vec - m_int) * 60)
 
-    data.frame(
-      etappe   = stages$etappe,
-      distanse = stages$distanse,
-      profil   = stages$profil,
-      start    = stages$start,
-      veksling = stages$veksling,
-      pace     = eff_pace,
-      tid_leg  = sprintf("%d:%02d", m_int, s_int),   # time for this leg
-      tid_veks = times,                               # cumulative clock time
-      stringsAsFactors = FALSE
+    list(
+      data = data.frame(
+        etappe   = stages$etappe,
+        distanse = stages$distanse,
+        profil   = stages$profil,
+        start    = stages$start,
+        veksling = stages$veksling,
+        pace     = eff_pace,
+        tid_leg  = sprintf("%d:%02d", m_int, s_int),
+        tid_veks = times,
+        stringsAsFactors = FALSE
+      ),
+      warn_msg = res$warn_msg
     )
+  })
+
+  ## Show popup warning if paces were padded with standard_pace
+  observeEvent(input$calculate, {
+    res <- results()
+    if (!is.null(res$warn_msg)) {
+      showModal(modalDialog(
+        title = tagList(icon("triangle-exclamation", style = "color:#e67e00;"),
+                        " Manglende fart"),
+        p(res$warn_msg),
+        footer = modalButton("OK"),
+        easyClose = TRUE
+      ))
+    }
   })
 
   ## Error banner
   output$error_msg <- renderUI({
     r <- results()
-    if (is.list(r) && !is.null(r$error))
+    if (!is.null(r$error))
       div(class = "alert alert-danger mt-2", icon("triangle-exclamation"), " ", r$error)
   })
 
   ## Summary cards
   output$summary_box <- renderUI({
     r <- results()
-    if (is.list(r) && !is.null(r$error)) return(NULL)
+    if (!is.null(r$error)) return(NULL)
+    r <- r$data
     total_m   <- sum((r$distanse / 1000) * r$pace)
     total_min <- floor(total_m); total_sec <- round((total_m - total_min) * 60)
     total_km  <- round(sum(r$distanse) / 1000, 2)
@@ -184,7 +223,8 @@ server <- function(input, output, session) {
   ## Stage table
   output$stage_table <- renderUI({
     r <- results()
-    if (is.list(r) && !is.null(r$error)) return(NULL)
+    if (!is.null(r$error)) return(NULL)
+    r <- r$data
 
     rows <- lapply(seq_len(nrow(r)), function(i) {
       row <- r[i, ]
