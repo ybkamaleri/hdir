@@ -73,9 +73,11 @@ ui <- page_sidebar(
     style = "display:flex; align-items:center; gap:12px;",
     span("🏃", style = "font-size:1.6rem;"),
     div(
-      div("Holmenkollstafetten 2026", style = "font-weight:700; font-size:1.15rem; line-height:1.1;"),
-      div("Estimert vekslingstider · St.Hanshaugen", style = "font-size:0.78rem; opacity:.7;")
-    )
+      style = "flex:1;",
+      div("Holmenkollstafetten", style = "font-weight:700; font-size:1.15rem; line-height:1.1;"),
+      div("Estimert vekslingstider", style = "font-size:0.78rem; opacity:.7;")
+    ),
+    # img(src = "hdir.png", height = "40px", style = "margin-left:auto;") #
   ),
   theme = bs_theme(
     version = 5,
