@@ -222,8 +222,8 @@ server <- function(input, output, session) {
          style = "letter-spacing:.05em; font-size:.72rem;"),
       div(style = "display:grid; gap:8px;",
         summary_card("Total distanse", paste0(total_km, " km"), "#1a5c2e"),
-        summary_card("Estimert tid",   sprintf("%d:%02d", total_min, total_sec), "#2e7d52"),
-        summary_card("Mål-tid",        finish, "#3a9e68")
+        summary_card("Estimert tidsbruk",   sprintf("%d:%02d", total_min, total_sec), "#2e7d52"),
+        summary_card("Tid i Mål",        finish, "#3a9e68")
       )
     )
   })
@@ -290,7 +290,7 @@ server <- function(input, output, session) {
           style = "background:#1a5c2e; color:#fff;",
           tags$tr(
             lapply(
-              c("Etappe", "Distanse", "Rute", "Tempo", "Veksling / Mål-tid"),
+              c("Etappe", "Distanse", "Rute", "Tempo", "Vekslingstid / Mål"),
               function(h) tags$th(h, style = "padding:10px 14px; font-weight:600;")
             )
           )
