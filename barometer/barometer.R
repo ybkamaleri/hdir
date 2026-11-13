@@ -240,7 +240,7 @@ hc <- hc |>
     startOnTick = FALSE,
     endOnTick = FALSE,
     tickPositions = c(50, 70, 100, 140, 200),  # readable labels, even spacing
-    title = list(text = paste0("Index (reference = ", ref_value, ")")),
+    title = list(text = "Norge"),
     gridLineWidth = 0,
     lineWidth = 1,
     plotLines = list(list(
@@ -261,7 +261,7 @@ hc <- hc |>
     plotLines = group_lines
   ) |>
   hc_title(
-    text = "Folkehelsebarometer for Oslo",
+    text = "Folkehelsebarometer",
     style = list(fontSize = "16px", fontWeight = "bold")
   ) |>
   hc_chart(
