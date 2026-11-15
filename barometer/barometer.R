@@ -46,27 +46,52 @@ DT[, group := rep(c("grp1", "grp2", "grp3", "grp4"), times = c(10, 5, 5, 14))]
 DT[, y_pos := .I - 1L]
 
 # =========================================================================
-# 2. Grey confidence-interval / range bars
+# 2.1 Grey confidence-interval / range bars
 # =========================================================================
 # An xrange point needs x (start), x2 (end) and y (row position).
-ci_data <- DT[, .(
+ci_grey <- DT[, .(
   x  = as.numeric(soylemin),
   x2 = as.numeric(soylemax),
   y  = as.numeric(y_pos)
 )]
 
 stopifnot(
-  !anyNA(ci_data),
-  all(ci_data$x > 0)           # log axis needs strictly positive values
+  !anyNA(ci_grey),
+  all(ci_grey$x > 0)           # log axis needs strictly positive values
 )
 
 # A bar with x == x2 has zero width and is invisible. Warn instead of
 # stopping, so the symbols are still drawn while you investigate the data.
-n_flat <- sum(ci_data$x2 <= ci_data$x)
+n_flat <- sum(ci_grey$x2 <= ci_grey$x)
 if (n_flat > 0) {
   warning(sprintf(
     "%d of %d bars have soylemax <= soylemin and will not be visible.",
-    n_flat, nrow(ci_data)
+    n_flat, nrow(ci_grey)
+  ))
+}
+
+# =========================================================================
+# 2.2 White 10 best-interval / range bars
+# =========================================================================
+# An xrange point needs x (start), x2 (end) and y (row position).
+ci_white <- DT[, .(
+  x  = as.numeric(beste10pct_min),
+  x2 = as.numeric(beste10stk_max),
+  y  = as.numeric(y_pos)
+)]
+
+# Ignore missing values when checking positivity
+stopifnot(
+  all(ci_white$x > 0, na.rm = TRUE)
+)
+
+# A bar with x == x2 has zero width and is invisible. Warn instead of
+# stopping, so the symbols are still drawn while you investigate the data.
+white_flat <- sum(ci_white$x2 <= ci_white$x, na.rm = TRUE)
+if (white_flat > 0) {
+  warning(sprintf(
+    "%d of %d bars have soylemax <= soylemin and will not be visible.",
+    white_flat, nrow(ci_white)
   ))
 }
 
@@ -135,20 +160,43 @@ group_lines <- lapply(group_positions, function(pos) {
 })
 
 # =========================================================================
-# 5. Base chart with the grey bars
+# 5.1 Base chart with the grey bars
 # =========================================================================
 hc <- highchart() |>
   # xrange is an add-on module; without it the series type is unknown
   hc_add_dependency("modules/xrange.js") |>
   hc_add_series(
-    data = list_parse(as.data.frame(ci_data)),  # keeps {x, x2, y} names
+    data = list_parse(as.data.frame(ci_grey)),  # keeps {x, x2, y} names
     type = "xrange",
     name = "Range",
     colorByPoint = FALSE,   # otherwise xrange ignores `color` below
     color = "#C8CACA",
     borderWidth = 0,
     borderRadius = 0,
-    pointWidth = 10,
+    pointWidth = 12,
+    grouping = FALSE,
+    zIndex = 1,             # behind the symbols
+    showInLegend = FALSE,
+    enableMouseTracking = TRUE,
+    tooltip = list(
+      pointFormat = "<b>Range</b><br>{point.x:.1f} to {point.x2:.1f}"
+    )
+  )
+
+
+# =========================================================================
+# 5.2 Base chart with the white bars
+# =========================================================================
+hc <- hc |>
+  hc_add_series(
+    data = list_parse(as.data.frame(ci_white)),  # keeps {x, x2, y} names
+    type = "xrange",
+    name = "Range",
+    colorByPoint = FALSE,   # otherwise xrange ignores `color` below
+    color = "#000800",
+    borderWidth = 0,
+    borderRadius = 0,
+    pointWidth = 4,
     grouping = FALSE,
     zIndex = 1,             # behind the symbols
     showInLegend = FALSE,
