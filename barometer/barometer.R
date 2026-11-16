@@ -103,29 +103,28 @@ if (white_flat > 0) {
 # `column` links a data column to its legend text and colours.
 # Rows with column = NA have no data column in this dataset and are skipped.
 status_style <- data.table(
-  column = c("roede", "groenne", "gule", "hvite", "hvitmprikk",
-             NA, NA, NA, NA),
+  column = c("roede", "groenne", "gule", "hvite", "hvitmprikk"),
+  # Use for legende text
   status = c(
     "Signifikant dårlig",
     "Signifikant bedre",
     "Ikke signifikant",
     "Ikke testet",
-    "Hvit med prikk",              # rename to the legend text you want
-    "Signifikant forskjell",
-    "Fylke ikke testet",
-    "Variasjonen mellom kommunene",
-    "De ti beste kommune"
+    "Hvit med prikk"
   ),
   fill = c(
-    "#FF0000", "#00DD00", "#FFD700", "#FFFFFF", "#FFFFFF",
-    "#CC79A7", "#00BFFF", "#005555", "#0000CD"
+    "#FF0000", "#00DD00", "#FFD700", "#FFFFFF", "#00BFFF"
   ),
   border = c(
-    "#CC0000", "#009900", "#CC9900", "#808080", "#808080",
-    "#993366", "#0077AA", "#003333", "#000080"
+    "#CC0000", "#009900", "#CC9900", "#808080", "#0077AA"
   ),
-  dot = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE)
+  dot = as.logical(c(0,0,0,0,1))
 )
+
+
+#   "#CC79A7", "#00BFFF", "#005555", "#0000CD"
+#   "#993366", "#0077AA", "#003333", "#000080"
+# status_style
 
 # na.rm = TRUE drops all the NA cells, so every indicator keeps one row.
 # figurverdi_graa is NOT included: it holds a value on every row (the same
@@ -173,7 +172,7 @@ hc <- highchart() |>
     color = "#C8CACA",
     borderWidth = 0,
     borderRadius = 0,
-    pointWidth = 12,
+    pointWidth = 13,
     grouping = FALSE,
     zIndex = 1,             # behind the symbols
     showInLegend = FALSE,
@@ -193,10 +192,10 @@ hc <- hc |>
     type = "xrange",
     name = "Range",
     colorByPoint = FALSE,   # otherwise xrange ignores `color` below
-    color = "#000800",
+    color = "#80A6D6",
     borderWidth = 0,
     borderRadius = 0,
-    pointWidth = 4,
+    pointWidth = 5,
     grouping = FALSE,
     zIndex = 1,             # behind the symbols
     showInLegend = FALSE,
@@ -236,24 +235,6 @@ add_status <- function(chart, col_name, status_name, fill, border, dot) {
       )
     )
 
-  # "White diamond with a dot": a small black circle drawn on top of the
-  # diamond. linkedTo makes it follow the legend entry of the series before it.
-  if (dot) {
-    chart <- chart |>
-      hc_add_series(
-        data = list_parse(selected),
-        type = "scatter",
-        name = paste(status_name, "(dot)"),
-        linkedTo = ":previous",
-        showInLegend = FALSE,
-        enableMouseTracking = FALSE,
-        zIndex = 5,
-        marker = list(
-          symbol = "circle", radius = 1.5,
-          fillColor = "#000000", lineWidth = 0
-        )
-      )
-  }
   chart
 }
 
