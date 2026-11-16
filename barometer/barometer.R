@@ -201,7 +201,7 @@ hc <- hc |>
   )
 
 # -------------------------------------------------------------------------
-# Grå prikk
+# Grå prikk for fylker verdi
 # -------------------------------------------------------------------------
 dt_gra <- data.frame(x = DT$figurverdi_graa, y = DT$y_pos)
 
@@ -211,7 +211,7 @@ hc <- hc |>
       type = "scatter",
       name = "Fylke verdi",
       color = "#808080",
-      zIndex = 3,           # above bars (1) and red line (3)
+      zIndex = 3,
       marker = list(
         symbol    = "diamond",
         radius    = 5,
@@ -271,9 +271,10 @@ for (i in seq_len(nrow(status_style))) {
 # =========================================================================
 # 7. Axes, title and styling
 # =========================================================================
-# Row labels: replace with real indicator names if you have them
+# Row labels and values
 DT[, indikator_navn := paste("Indikator ", lpnr, sep = " ")]
 y_labels <- as.character(DT$indikator_navn)
+
 
 hc <- hc |>
   hc_xAxis(
