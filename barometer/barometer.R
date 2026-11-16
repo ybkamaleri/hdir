@@ -96,12 +96,11 @@ if (white_flat > 0) {
 }
 
 # =========================================================================
-# 3. Symbols (diamonds): from wide to long format
+# 3. Symbols: from wide to long format
 # =========================================================================
 # Each indicator has its value in exactly ONE of the colour columns
-# (roede, groenne, gule, hvite, hvitmprikk); the others are NA.
+# (roede, groenne, gule, hvite, hvitmprikk).
 # `column` links a data column to its legend text and colours.
-# Rows with column = NA have no data column in this dataset and are skipped.
 status_style <- data.table(
   column = c("roede", "groenne", "gule", "hvite", "hvitmprikk"),
   # Use for legende text
@@ -114,7 +113,6 @@ status_style <- data.table(
   ),
   fill = c("#FF0000","#00DD00","#FFD700","#FFFFFF","#00BFFF"),
   border = c("#CC0000","#009900","#CC9900","#808080","#0077AA"),
-  dot = as.logical(c(0,0,0,0,1)),
   symbol = c("circle", "circle", "diamond", "triangle-down", "square")
 )
 
@@ -201,6 +199,30 @@ hc <- hc |>
       pointFormat = "<b>Range</b><br>{point.x:.1f} to {point.x2:.1f}"
     )
   )
+
+# -------------------------------------------------------------------------
+# Grå prikk
+# -------------------------------------------------------------------------
+dt_gra <- data.frame(x = DT$figurverdi_graa, y = DT$y_pos)
+
+hc <- hc |>
+    hc_add_series(
+      data = list_parse(dt_gra),
+      type = "scatter",
+      name = "Fylke verdi",
+      color = "#808080",
+      zIndex = 3,           # above bars (1) and red line (3)
+      marker = list(
+        symbol    = "diamond",
+        radius    = 5,
+        fillColor = "#808080",
+        lineColor = "#000000",
+        lineWidth = 1.2
+      ),
+      tooltip = list(
+        pointFormat = "<b>{series.name}</b><br>Value: {point.x:.1f}"
+      )
+    )
 
 # =========================================================================
 # 6. Symbols: one scatter series per status
