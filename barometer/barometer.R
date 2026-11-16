@@ -108,17 +108,14 @@ status_style <- data.table(
   status = c(
     "Signifikant dårlig",
     "Signifikant bedre",
-    "Ikke signifikant",
+    "Ikke signifikant fra landet",
     "Ikke testet",
-    "Hvit med prikk"
+    "Signifikant forskjell fra landet"
   ),
-  fill = c(
-    "#FF0000", "#00DD00", "#FFD700", "#FFFFFF", "#00BFFF"
-  ),
-  border = c(
-    "#CC0000", "#009900", "#CC9900", "#808080", "#0077AA"
-  ),
-  dot = as.logical(c(0,0,0,0,1))
+  fill = c("#FF0000","#00DD00","#FFD700","#FFFFFF","#00BFFF"),
+  border = c("#CC0000","#009900","#CC9900","#808080","#0077AA"),
+  dot = as.logical(c(0,0,0,0,1)),
+  symbol = c("circle", "circle", "diamond", "triangle-down", "square")
 )
 
 
@@ -172,7 +169,7 @@ hc <- highchart() |>
     color = "#C8CACA",
     borderWidth = 0,
     borderRadius = 0,
-    pointWidth = 13,
+    pointWidth = 12,
     grouping = FALSE,
     zIndex = 1,             # behind the symbols
     showInLegend = FALSE,
@@ -195,7 +192,7 @@ hc <- hc |>
     color = "#80A6D6",
     borderWidth = 0,
     borderRadius = 0,
-    pointWidth = 5,
+    pointWidth = 4,
     grouping = FALSE,
     zIndex = 1,             # behind the symbols
     showInLegend = FALSE,
@@ -210,7 +207,7 @@ hc <- hc |>
 # =========================================================================
 # One series per status gives one legend entry per status and its own
 # fill/border colour.
-add_status <- function(chart, col_name, status_name, fill, border, dot) {
+add_status <- function(chart, col_name, status_name, fill, border, symbol) {
   selected <- symbols[column == col_name, .(x, y)]
 
   # Nothing to draw: skip, so no empty legend entry appears
@@ -224,8 +221,8 @@ add_status <- function(chart, col_name, status_name, fill, border, dot) {
       color = fill,
       zIndex = 4,           # above bars (1) and red line (3)
       marker = list(
-        symbol    = "diamond",
-        radius    = 6,
+        symbol    = symbol,
+        radius    = 5,
         fillColor = fill,
         lineColor = border,
         lineWidth = 1.2
@@ -245,7 +242,7 @@ for (i in seq_len(nrow(status_style))) {
     status_name = status_style$status[i],
     fill        = status_style$fill[i],
     border      = status_style$border[i],
-    dot         = status_style$dot[i]
+    symbol      = status_style$symbol[i]
   )
 }
 
