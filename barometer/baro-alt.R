@@ -8,7 +8,13 @@ fcsv <- "InndataBarometer_kommune2026.csv"
 DT <- data.table::fread(file.path(path, fcsv))
 data.table::setnames(DT, tolower(names(DT)))
 
-DT[stedskode_string != 1103, .ROW := NULL]
+# DT[stedskode_string != 1103, .ROW := NULL] #Stavanger
+DT[stedskode_string != 301, .ROW := NULL]
+
+library(data.table)
+library(highcharter)
+
+# Assumes `DT` is already loaded: one row per indicator, for ONE place.
 
 # =========================================================================
 # 0. Settings
@@ -22,7 +28,7 @@ stopifnot(x_min > 0, x_max > x_min)
 
 # Layout. The chart is split horizontally: the left `table_frac` of the plot
 # width holds the table text, the rest holds the log10 chart.
-table_frac <- 0.50
+table_frac <- 0.60                               # 60% table, 40% chart
 row_px     <- 24                                 # height of one row in pixels
 min_bar_px <- 3                                  # width of zero-width bars; 0 = off
 
