@@ -21,6 +21,15 @@ source(here::here("barometer/tema-tbl.R"))
 ref_value <- unique(DT$ref)
 stopifnot("`ref` must have exactly one value" = length(ref_value) == 1)
 
+# Maximum height of the red line
+y_max <- max(DT$lpnr - 1, na.rm = TRUE)
+
+# Two points with the same x value create a vertical line
+ref_line <- data.frame(
+  x = c(ref_value, ref_value),
+  y = c(-0.5, y_max + 0.5)
+)
+
 # x-axis range. A log axis cannot show 0 or negative values, so min > 0.
 # The data is capped at 200 and its lowest value is 50. On a log scale
 # 50 to 200 is symmetric around 100 (100 / 2 and 100 * 2).
@@ -461,13 +470,13 @@ x_axes <- list(
     tickPositions = c(50, 70, 100, 140, 200),  # readable labels, even spacing
     title = list(text = "Norge"),
     gridLineWidth = 0,
-    lineWidth = 1,
-    plotLines = list(list(
-      value = ref_value,    # 100, in original units
-      color = "#CC0033",
-      width = 2.5,
-      zIndex = 6
-    ))
+    lineWidth = 1
+#     plotLines = list(list(
+#       value = ref_value,    # 100, in original units
+#       color = "#CC0033",
+#       width = 2.5,
+#       zIndex = 6
+#     ))
   ),
   list(
     min = 0, max = 1, visible = FALSE,
@@ -476,6 +485,18 @@ x_axes <- list(
   )
 )
 hc$x$hc_opts$xAxis <- x_axes     # same effect as hc_xAxis_multiples()
+
+hc <- hc |> 
+  hc_add_series(
+    data = highcharter::list_parse2(ref_line),
+    type = "line",
+    color = "#CC0033",
+    lineWidth = 2.5,
+    marker = list(enabled = FALSE),
+    enableMouseTracking = FALSE,
+    showInLegend = FALSE,
+    zIndex = 6
+  )
 
 hc <- hc |>
   hc_yAxis(
